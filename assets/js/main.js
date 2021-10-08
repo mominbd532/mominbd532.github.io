@@ -24,15 +24,16 @@
             imJs.smothScroll_Two();
             imJs.stickyAdjust();
             imJs.testimonialActivation();
-            imJs.contactForm();
+            imJs.validateForm();
             imJs.wowActive();
             imJs.awsActivation();
             imJs.demoActive();
             imJs.activePopupDemo();
-            
+
+
         },
 
-        
+
         activePopupDemo: function (e) {
             $('.popuptab-area li a.demo-dark').on('click', function (e) {
                 $('.demo-modal-area').addClass('dark-version');
@@ -54,43 +55,102 @@
             })
         },
 
-        contactForm: function () {
-            $('.rwt-dynamic-form').on('submit', function (e) {
-				e.preventDefault();
-				var _self = $(this);
-				var __selector = _self.closest('input,textarea');
-				_self.closest('div').find('input,textarea').removeAttr('style');
-				_self.find('.error-msg').remove();
-				_self.closest('div').find('button[type="submit"]').attr('disabled', 'disabled');
-				var data = $(this).serialize();
-				$.ajax({
-					url: 'mail.php',
-					type: "post",
-					dataType: 'json',
-					data: data,
-					success: function (data) {
-						_self.closest('div').find('button[type="submit"]').removeAttr('disabled');
-						if (data.code == false) {
-							_self.closest('div').find('[name="' + data.field + '"]');
-							_self.find('.rn-btn').after('<div class="error-msg"><p>*' + data.err + '</p></div>');
-						} else {
+        validateForm: function(){
+            // validate signup form on keyup and submit
+            $("#gform").validate({
+                rules: {
+                    name: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 50
+                    },
+                    phone: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 30
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    subject: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 150
+                    },
+                    message: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 800
+                    }
+
+                },
+                messages: {
+                    name: {
+                        required: "Plase enter your name",
+                        minlength: "Plase enter mimimun 2 data",
+                        maxlength: "Maximum limit 50"
+                    },
+                    phone: {
+                        required: "Plase enter your phone nunber",
+                        minlength: "Plase enter mimimun 6 digit",
+                        maxlength: "Maximum limit 30"
+                    },
+                    email: {
+                        required: "Plase enter your email",
+                        email: "Plase enter valid email"
+                    },
+                    subject: {
+                        required: "Plase enter your subject",
+                        minlength: "Plase enter mimimun 2 data",
+                        maxlength: "Maximum limit 150"
+                    },
+                    message: {
+                        required: "Plase enter your message",
+                        minlength: "Plase enter mimimun 2 data",
+                        maxlength: "Maximum limit 800"
+                    }
+
+                },
+
+                submitHandler: function(form) {
+                    var _self = $('.rwt-dynamic-form');
+                    var __selector = _self.closest('input,textarea');
+                    _self.closest('div').find('input,textarea').removeAttr('style');
+                    _self.find('.error-msg').remove();
+                    _self.closest('div').find('button[type="submit"]').attr('disabled', 'disabled');
+
+                    $.ajax({
+                        url: 'https://script.google.com/macros/s/AKfycbwNWG8m0ANRqj79wYOjZCwUMKv1OwU8kuycUXzOMlhqlWthXS07dfAY6mB3htPQQJlR/exec',
+                        type: "POST",
+                        data: $(form).serialize(),
+                        success: function(response) {
+                            _self.closest('div').find('button[type="submit"]').removeAttr('disabled');
+
 							$('.error-msg').hide();
 							$('.form-group').removeClass('focused');
-							_self.find('.rn-btn').after('<div class="success-msg"><p>' + data.success + '</p></div>');
+							_self.find('.rn-btn').after('<div class="success-msg"><p>Your message send successfully </p></div>');
 							_self.closest('div').find('input,textarea').val('');
 
 							setTimeout(function () {
 								$('.success-msg').fadeOut('slow');
 							}, 5000);
-						}
-					}
-				});
-			});
+
+                        },
+                        error: function(err){
+                            _self.closest('div').find('button[type="submit"]').removeAttr('disabled');
+                            _self.closest('div').find('[name="' + err + '"]');
+                            _self.find('.rn-btn').after('<div class="error-msg"><p>* Error</p></div>');
+                        }
+                    });
+
+                }
+            });
+
+
 
         },
 
-        
-        
         wowActive: function () {
             new WOW().init();
         },
@@ -325,7 +385,7 @@
                     $(scrollTop).css('opacity', '0');
                 }
             });
-            
+
             //Click event to scroll to top
             $(scrollTop).on('click', function () {
                 $('html, body').animate({
